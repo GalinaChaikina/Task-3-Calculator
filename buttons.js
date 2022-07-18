@@ -5,7 +5,6 @@ class DigitButton {
     constructor(value) {
         this.value = value;
         this.type = typeof this.value;
-    
         this.init();
         this.selectValue();
     }
@@ -20,32 +19,29 @@ class DigitButton {
     selectValue() {
         this.element.addEventListener('click', () => {
             if (this.type === 'number') {
-                a = this.value;
-                clickNumber(a); 
+                numbers = this.value;
+                clickNumber(numbers); 
             }
             if ((this.value === '+') || (this.value === '-') || (this.value === '*') || (this.value === '/')) {
-                b = this.value;
-                clickOperator(b);
-                console.log(`display.value ${display.value}, memoryCurrentNumber ${memoryCurrentNumber}, memoryOperator ${memoryOperator}, b ${b}, memoryNewNumber ${memoryNewNumber}`);
+                operators = this.value;
+                clickOperator(operators);
             }
             if (this.value === 'AC') {
                 display.clear();
                 memoryNewNumber = false;
                 memoryCurrentNumber = 0;
                 memoryOperator = '';
-                console.log(`display.value ${display.value}, memoryCurrentNumber ${memoryCurrentNumber}, memoryOperator ${memoryOperator}, b ${b}, memoryNewNumber ${memoryNewNumber}`);
             }
             if (this.value === 'DEL') {
                 clickDel(); 
-                console.log(`display.value ${display.value}, memoryCurrentNumber ${memoryCurrentNumber}, memoryOperator ${memoryOperator}, b ${b}, memoryNewNumber ${memoryNewNumber}`);
             }
             if (this.value === '.') {
                 clickTochka(); 
-                console.log(`display.value ${display.value}, memoryCurrentNumber ${memoryCurrentNumber}, memoryOperator ${memoryOperator}, b ${b}, memoryNewNumber ${memoryNewNumber}`);
             }
             if (this.element.value === '=') {
-                clickOperator(b);
+                clickOperator(operators);
             }
+            clickAudio();
         })
     }
 }
@@ -58,56 +54,52 @@ for (let i = 0; i < butMeaning.length; i+=1) {
     butCalculator[i] = new DigitButton(butMeaning[i]);
 }
 
-
 // калькулятор расчеты
-let a;
-let b;
+let numbers;
+let operators;
 
 let memoryCurrentNumber = 0; // текущее значение числа
 let memoryNewNumber = false; // новое значение числа (нет/да)
 let memoryOperator = ''; // операция в памяти
    
-function clickNumber(a) {
+function clickNumber(numbers) {
     if (memoryNewNumber) { 
-        display.value = a;
+        display.value = numbers;
         memoryNewNumber = false;  
     } else {
         if (display.value =='0') {
-            display.value = String(a);
+            display.value = String(numbers);
         } else {
-            display.value += String(a);
+            display.value += String(numbers);
         }
     }
     display.showValue();
 }
 
-function clickOperator(b) {
+function clickOperator(operators) {
     let globalNumber = display.value;
     if (memoryNewNumber && memoryOperator != '=') {
         display.value = memoryCurrentNumber;
     } else {
-        memoryOperator = b;
         memoryNewNumber = true;
-        if (memoryOperator === '+') {
+        if (memoryOperator == '+') {
             memoryCurrentNumber += parseFloat(globalNumber);
-        } else if (memoryOperator === '-') {
+        } else if (memoryOperator == '-') {
             memoryCurrentNumber -= parseFloat(globalNumber);
-        } else if (memoryOperator === '*') {
+        } else if (memoryOperator == '*') {
             memoryCurrentNumber *= parseFloat(globalNumber);  
-        } else if (memoryOperator === '/') {
+        } else if (memoryOperator == '/') {
             memoryCurrentNumber /= parseFloat(globalNumber);
         } else {
             memoryCurrentNumber = parseFloat(globalNumber);
-            // memoryOperator = '';
-            // display.value = memoryCurrentNumber;
+            display.value = memoryCurrentNumber;
+            memoryOperator = operators;
         }
-        display.value = memoryCurrentNumber;
     }
-    display.showOperator(b);
+    display.value = memoryCurrentNumber;
+    memoryOperator = operators;
+    display.showOperator(operators);
     display.showValue();
-    
-    
-    console.log(`display.value ${display.value}, memoryCurrentNumber ${memoryCurrentNumber}, memoryOperator ${memoryOperator}, b ${b}` );
 }
 
 function clickDel() {
@@ -121,12 +113,17 @@ function clickTochka() {
         numberDisplay = '0.';
         memoryNewNumber = false;
     } else {
-        if (numberDisplay.indexOf('.') === -1)
-        numberDisplay += '.';
+        if (String(numberDisplay).indexOf('.') === -1) {
+            numberDisplay += '.';
+        }
     }
     display.value = numberDisplay;
     display.showValue();
-    
+}
+
+function clickAudio () {
+    const myAudio = new Audio('./knopka-zvuk.mp3');
+    myAudio.paused ? myAudio.play() : myAudio.paused();
 }
 
 export {butCalculator}
